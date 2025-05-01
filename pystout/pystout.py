@@ -365,7 +365,7 @@ Output:
     df = pd.DataFrame(data,columns=colnames,index=rownames)
 
     for key,value in addrows.items():
-        df = df.append(pd.DataFrame([[str(v) for v in value]],index=[key],columns=df.columns))
+        df = pd.concat([df, pd.DataFrame([[str(v) for v in value]],index=[key],columns=df.columns)])
 
     # Do stuff if there are model statistics to pull
     if modstat:
