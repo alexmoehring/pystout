@@ -42,11 +42,11 @@ Options:
         for key,value in mgroups.items():
             if key:
                 if type(value)==int:
-                    groupedcols += '& \multicolumn{1}{c}{%s} ' %key
-                    groupedlines += '\cline{%s-%s}\n' %(str(value+1),str(value+1))
+                    groupedcols += r'& \multicolumn{1}{c}{%s} ' %key
+                    groupedlines += '\\cline{%s-%s}\n' %(str(value+1),str(value+1))
                 elif type(value)==list:
-                    groupedcols += '& \multicolumn{%i}{c}{%s} ' %(len(range(value[0],value[1]+1)),key)
-                    groupedlines += '\cline{%s}\n' %('-'.join([str(i+1) for i in value]))
+                    groupedcols += r'& \multicolumn{%i}{c}{%s} ' %(len(range(value[0],value[1]+1)),key)
+                    groupedlines += '\\cline{%s}\n' %('-'.join([str(i+1) for i in value]))
             else:
                 if type(value)==int:
                     groupedcols += '& '
@@ -56,9 +56,9 @@ Options:
         groupedlines = groupedlines[:-1]
 
     header = '\n'.join(['{',
-                        '\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\\fi}',
-                        '\\begin{tabular}{@{\extracolsep{2pt}}l*{%i}{c}@{}}' %df.shape[1],
-                        '\hline\hline',
+                        r'\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}',
+                        r'\begin{tabular}{@{\extracolsep{2pt}}l*{%i}{c}@{}}' %df.shape[1],
+                        r'\hline\hline',
                         groupedcols,
                         groupedlines,
                         ''])
@@ -67,22 +67,22 @@ Options:
     # We do extra column spacing just in case there is grouping of variables (adds a space)
 
     # Add footnotes (if any)
-    footnotes = ['\multicolumn{%i}{l}{\\%s %s}' %(df.shape[1]+1,footnotesize,ii) for ii in addnotes]
+    footnotes = [r'\multicolumn{%i}{l}{\%s %s}' %(df.shape[1]+1,footnotesize,ii) for ii in addnotes]
     if footnotes:
         footnotes = ('\\vspace{-.%iem} \\\\\n' %spacedict[footnotesize]).join(footnotes)
         footnotes = [footnotes]
-    footer = '\n'.join(['\hline\hline']+footnotes+['\end{tabular}','}'])
+    footer = '\n'.join([r'\hline\hline']+footnotes+[r'\end{tabular}','}'])
 
     if title and label:
-        header = '\n'.join(['\\begin{table}[%s]' %tableopts,f'\caption{{{title}}}',
-                            f'\label{{{label}}}',header])
+        header = '\n'.join(['\\begin{table}[%s]' %tableopts,rf'\caption{{{title}}}',
+                            rf'\label{{{label}}}',header])
     elif title and not label:
-        header = '\n'.join(['\\begin{table}[%s]' %tableopts,f'\caption{{{title}}}',header])
+        header = '\n'.join(['\\begin{table}[%s]' %tableopts,rf'\caption{{{title}}}',header])
     elif label and not title:
-        header = '\n'.join(['\\begin{table}[%s]' %tableopts,f'\label{{{label}}}',header])
+        header = '\n'.join(['\\begin{table}[%s]' %tableopts,rf'\label{{{label}}}',header])
 
     if title or label:
-        footer += '\n\end{table}'
+        footer += '\n\\end{table}'
 
 
     ###########################################################################
@@ -92,7 +92,7 @@ Options:
 
     tex.write(header)
     tex.write(' & '.join([''] + df.columns.to_list())+
-              '\n'.join([' \\\\','\hline','']))
+              '\n'.join([' \\\\',r'\hline','']))
 
     for ii in range(0,df.shape[0]):
         row = ' '.join([str(df.index[ii]),'& '])
@@ -105,7 +105,7 @@ Options:
         tex.write(row)
 
     if options.empty==False:
-        tex.write('\n\hline\n')
+        tex.write('\n\\hline\n')
         for ii in range(0,options.shape[0]):
             row = ' '.join([str(options.index[ii]),'& '])
             for jj in range(0,options.shape[1]):
@@ -134,9 +134,9 @@ def pystout(models, file, exogvars=None, endog_names=False,
             modstat={
                 'nobs':'N',
                 'fvalue':'F-stat',
-                'rsquared_adj':'Adj. R\sym{2}',
+                'rsquared_adj':r'Adj. R\sym{2}',
                 'fvalue_robust':'F-stat (robust)',
-                'rsquared_within':'R\sym{2} (Within)',
+                'rsquared_within':r'R\sym{2} (Within)',
                 'aic':'AIC',
                 'bic':'BIC'
             },
@@ -360,7 +360,7 @@ Output:
     rownames = [tryrelabel(p) for p in paramlist.copy()]
     for ii in range(1,2*len(rownames)+1,2):
         rownames.insert(ii,'')
-    rownames = [x.replace('_','\_') for x in rownames]
+    rownames = [x.replace('_',r'\_') for x in rownames]
 
     df = pd.DataFrame(data,columns=colnames,index=rownames)
 
